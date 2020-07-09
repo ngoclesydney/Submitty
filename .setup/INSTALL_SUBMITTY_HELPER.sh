@@ -384,6 +384,7 @@ if [ "${WORKER}" == 0 ]; then
     find ${SUBMITTY_INSTALL_DIR}/more_autograding_examples -type d -exec chmod 555 {} \;
     find ${SUBMITTY_INSTALL_DIR}/more_autograding_examples -type f -exec chmod 444 {} \;
 fi
+
 ########################################################################################################################
 ########################################################################################################################
 # BUILD JUNIT TEST RUNNER (.java file)
@@ -736,20 +737,25 @@ systemctl daemon-reload
 # start the shipper daemon (if it was running)
 
 for i in "${DAEMONS[@]}"; do
-    is_active=is_${i}_active_before
-    if [[ "${!is_active}" == "0" ]]; then
-        systemctl start ${i}
-        set +e
-        systemctl is-active --quiet ${i}
-        is_active_after=$?
-        set -e
-        if [[ "$is_active_after" != "0" ]]; then
-            echo -e "\nERROR!  Failed to restart ${i}\n"
+    if systemctl is-enabled ${i} > /dev/null 2>&1; then
+        is_active=is_${i}_active_before
+        if [[ "${!is_active}" == "0" ]]; then
+            systemctl start ${i}
+            set +e
+            systemctl is-active --quiet ${i}
+            is_active_after=$?
+            set -e
+            if [[ "$is_active_after" != "0" ]]; then
+                echo -e "\nERROR!  Failed to restart ${i}\n"
+            fi
+            echo -e "Restarted ${i}"
+        else
+            echo -e "\nNOTE: ${i} is not currently running\n"
+            echo -e "To start the daemon, run:\n   sudo systemctl start ${i}\n"
         fi
-        echo -e "Restarted ${i}"
     else
-        echo -e "\nNOTE: ${i} is not currently running\n"
-        echo -e "To start the daemon, run:\n   sudo systemctl start ${i}\n"
+        systemctl enable ${i}
+        systemctl start ${i}
     fi
 done
 

@@ -95,8 +95,4 @@ python3 ${SUBMITTY_REPOSITORY}/migration/run_migrator.py -e master -e system mig
 
 bash ${SUBMITTY_INSTALL_DIR}/.setup/INSTALL_SUBMITTY.sh clean
 
-systemctl start submitty_autograding_shipper
-systemctl start submitty_autograding_worker
-systemctl start submitty_websocket_server
-
 echo 'Finished setup.'
