@@ -274,6 +274,7 @@ jobs:
         - sudo python3 /usr/local/submitty/bin/generate_repos.py ${SEMESTER} sample open_homework
         - bash tests/git_test.sh
         - sudo bash tests/test_site_error_log.sh
+        - journalctl -u submitty_websocket_server
       before_cache:
         - sudo rm -rf ${HOME}/.composer/cache
         - sudo mv /home/submitty_php/.composer/cache ${HOME}/.composer
